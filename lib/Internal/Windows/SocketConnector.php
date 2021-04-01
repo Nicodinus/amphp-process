@@ -365,6 +365,11 @@ final class SocketConnector
         \proc_close($handle->proc);
 
         $handle->joinDeferred->fail($error);
+
+        if ($handle->status === ProcessStatus::STARTING) {
+            Loop::cancel($handle->childPidWatcher);
+            $handle->pidDeferred->fail($error);
+        }
     }
 
     public function registerPendingProcess(Handle $handle)
